@@ -6,13 +6,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { AccountModule } from '../account/account.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import { ConfigService } from '@nestjs/config';
+import { RateLimitterModule } from '../../rate-limitter/rate-limitter.module';
 import { join } from 'path';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RateLimitterService } from 'src/rate-limitter/rate-limitter.service';
 
 @Module({
   imports: [
     DatabaseModule,
     AccountModule,
+    RateLimitterModule,
     JwtModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET_OR_KEY'),
@@ -44,6 +47,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, RateLimitterService],
 })
 export class AuthModule {}

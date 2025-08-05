@@ -13,6 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/shared/types/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { RateLimitterService } from 'src/rate-limitter/rate-limitter.service';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
     private mailerService: MailerService,
     private configService: ConfigService,
+    private rateLimitterService: RateLimitterService,
   ) {}
   async register(registerDto: RegisterDto) {
     const { email, password, confirmPassword } = registerDto;
@@ -107,6 +109,10 @@ export class AuthService {
 
   async resendVertification(id: number) {
     const account = await this.accountService.findById(id);
+
+    if (!this.rateLimitterService.isAllowed(account.email, 30)) {
+      throw new BadRequestException('Too many request');
+    }
 
     const mailToken = await this.jwtService.signAsync(
       {

@@ -3,6 +3,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AccountModule } from './modules/account/account.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { ConfigModule } from '@nestjs/config';
+import { RateLimitterModule } from './rate-limitter/rate-limitter.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     AccountModule,
     ProfileModule,
+    RateLimitterModule,
   ],
 })
 export class AppModule {}
