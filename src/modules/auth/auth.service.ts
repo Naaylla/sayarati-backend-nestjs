@@ -12,6 +12,7 @@ import { AccountService } from '../account/account.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/shared/types/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
     private accountService: AccountService,
     private jwtService: JwtService,
     private mailerService: MailerService,
+    private configService: ConfigService,
   ) {}
   async register(registerDto: RegisterDto) {
     const { email, password, confirmPassword } = registerDto;
@@ -53,12 +55,11 @@ export class AuthService {
         expiresIn: '1h',
       },
     );
-
     const sentMail = await this.mailerService.sendMail({
-      to: 'test@nestjs.com', // list of receivers
-      from: 'noreply@nestjs.com', // sender address
+      to: 'kemmounramzy93@gmail.com', // list of receivers
+      from: 'abderrahmane.test@gmail.com', // sender address
       subject: 'Testing Nest MailerModule ✔', // Subject line
-      text: mailToken, // plaintext body
+      text: 'welcome', // plaintext body
       html: '<b>welcome</b>', // HTML body content
     });
 
@@ -104,13 +105,25 @@ export class AuthService {
     return account;
   }
 
-  async resendVertification() {
+  async resendVertification(id: number) {
+    const account = await this.accountService.findById(id);
+
+    const mailToken = await this.jwtService.signAsync(
+      {
+        id,
+        type: 'EMAIL_VERIFICATION',
+      },
+      {
+        expiresIn: '1h',
+      },
+    );
+
     const sentMail = await this.mailerService.sendMail({
-      to: 'test@nestjs.com', // list of receivers
-      from: 'noreply@nestjs.com', // sender address
-      subject: 'Testing Nest MailerModule ✔', // Subject line
-      text: 'welcome', // plaintext body
-      html: '<b>welcome</b>', // HTML body content
+      to: account.email, // list of receivers
+      from: this.configService.get('EMAIL_USER'),
+      subject: 'Testing Nest MailerModule ✔',
+      text: 'welcome',
+      html: mailToken,
     });
 
     console.log({ sentMail });

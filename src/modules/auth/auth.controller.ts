@@ -19,9 +19,12 @@ export class AuthController {
 
   @Get('verify')
   verifyAccount(@Query('token') token: string) {
-    return this.verifyAccount(token);
+    return this.authService.verifyAccount(token);
   }
 
   @Post('resend-verification')
-  resendVerification() {}
+  resendVerification() {
+    const userId = 28;
+    return this.authService.resendVertification(userId);
+  }
 }

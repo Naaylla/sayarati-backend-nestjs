@@ -7,34 +7,40 @@ import { AccountModule } from '../account/account.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { join } from 'path';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     DatabaseModule,
     AccountModule,
-    JwtModule.register({
-      secret: 'YOUR_SECRET',
+    JwtModule.registerAsync({
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET_OR_KEY'),
+      }),
+      inject: [ConfigService],
     }),
-    MailerModule.forRoot({
-      transport: {
-        host: '<host>',
-        port: Number('<port>'),
-        secure: false,
-        auth: {
-          user: '<username>',
-          pass: '<password>',
+    MailerModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('EMAIL_HOST'),
+          secure: false,
+          auth: {
+            user: configService.get<string>('EMAIL_USER'),
+            pass: configService.get<string>('EMAIL_PASSWORD'),
+          },
         },
-      },
-      defaults: {
-        from: '"From Name" <from@example.com>',
-      },
-      template: {
-        dir: join(__dirname, 'templates'),
-        adapter: new EjsAdapter(),
-        options: {
-          strict: true,
+        defaults: {
+          from: '"From Name" <from@example.com>',
         },
-      },
+        template: {
+          dir: join(__dirname, 'templates'),
+          adapter: new EjsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
