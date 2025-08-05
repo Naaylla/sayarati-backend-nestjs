@@ -7,15 +7,18 @@ import {
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { Repository } from 'typeorm';
-import { Account } from '../account/entities/account.entity';
 import { HashUtil } from 'src/core/utils/hash.util';
+import { AccountService } from '../account/account.service';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'src/shared/types/jwt';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('ACCOUNT_REPOSITORY')
-    private accountRepository: Repository<Account>,
+    private accountService: AccountService,
+    private jwtService: JwtService,
+    private mailerService: MailerService,
   ) {}
   async register(registerDto: RegisterDto) {
     const { email, password, confirmPassword } = registerDto;
@@ -26,26 +29,46 @@ export class AuthService {
     }
     const hashedPassword = await HashUtil.hash(password);
 
-    const account = this.accountRepository.create({
+    const account = await this.accountService.create({
       email,
       password: hashedPassword,
-      profiles: [],
     });
 
-    await this.accountRepository.insert(account);
+    const accessToken = this.jwtService.signAsync(
+      {
+        id: account.id,
+        type: 'AUTHENTICATION',
+      },
+      {
+        expiresIn: '1d',
+      },
+    );
 
-    const { password: _, ...accountWithoutPassword } = account;
+    const mailToken = await this.jwtService.signAsync(
+      {
+        id: account.id,
+        type: 'EMAIL_VERIFICATION',
+      },
+      {
+        expiresIn: '1h',
+      },
+    );
 
-    return accountWithoutPassword;
+    const sentMail = await this.mailerService.sendMail({
+      to: 'test@nestjs.com', // list of receivers
+      from: 'noreply@nestjs.com', // sender address
+      subject: 'Testing Nest MailerModule ✔', // Subject line
+      text: mailToken, // plaintext body
+      html: '<b>welcome</b>', // HTML body content
+    });
+
+    console.log({ sentMail });
+    return { account, accessToken };
   }
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
 
-    const account = await this.accountRepository.findOne({
-      where: {
-        email,
-      },
-    });
+    const account = await this.accountService.findByEmail(email);
 
     if (!account) {
       throw new NotFoundException('Account not found');
@@ -60,8 +83,38 @@ export class AuthService {
     if (!isValidPassword) {
       throw new NotFoundException('Password is incorrect');
     }
-    const { password: _, ...accountWithoutPassword } = account;
 
-    return accountWithoutPassword;
+    const accessToken = this.jwtService.signAsync({
+      id: account.id,
+    });
+
+    return { account, accessToken };
+  }
+
+  async verifyAccount(token: string) {
+    const { id, type } = await this.jwtService.verifyAsync<JwtPayload>(token);
+    if (type !== 'EMAIL_VERIFICATION') {
+      return;
+    }
+
+    const account = this.accountService.update(id, {
+      isVerified: true,
+    });
+
+    return account;
+  }
+
+  async resendVertification() {
+    const sentMail = await this.mailerService.sendMail({
+      to: 'test@nestjs.com', // list of receivers
+      from: 'noreply@nestjs.com', // sender address
+      subject: 'Testing Nest MailerModule ✔', // Subject line
+      text: 'welcome', // plaintext body
+      html: '<b>welcome</b>', // HTML body content
+    });
+
+    console.log({ sentMail });
+
+    return sentMail;
   }
 }
