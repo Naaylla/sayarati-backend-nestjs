@@ -5,7 +5,6 @@ export const databaseProviders: Provider[] = [
   {
     provide: 'DATA_SOURCE',
     useFactory: async () => {
-      console.log('test');
       const dataSource = new DataSource({
         type: 'postgres',
         host: 'localhost',
@@ -13,7 +12,7 @@ export const databaseProviders: Provider[] = [
         username: 'postgres',
         password: 'root',
         database: 'postgres',
-        entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+        entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
         synchronize: true,
       });
 
