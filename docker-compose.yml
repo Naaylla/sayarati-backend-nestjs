@@ -1,4 +1,13 @@
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+
   postgres:
     image: postgres:16
     restart: always
@@ -11,7 +20,6 @@ services:
       POSTGRES_USER: sayarati
       POSTGRES_PASSWORD: sayarati
       POSTGRES_DB: sayarati
-
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -23,6 +31,7 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 volumes:
-  weaviate_data:
   postgres_data:
   pgadmin_data:
+  redis_data:
+    driver: local

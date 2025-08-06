@@ -1,12 +1,15 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import { AccountService } from './account.service';
+import type { Request } from 'express';
+import { REQUEST } from '@nestjs/core';
 
 @Controller('account')
 export class AccountController {
-  constructor(private readonly accountService: AccountService) {}
+  constructor(
+    @Inject(REQUEST) private readonly request: Request,
+    private readonly accountService: AccountService,
+  ) {}
 
-  @Get()
-  findAll() {
-    return this.accountService.findAll();
-  }
+  @Get('profile')
+  getProfile() {}
 }

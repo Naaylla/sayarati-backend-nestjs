@@ -7,9 +7,9 @@ import { AccountModule } from '../account/account.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { ConfigService } from '@nestjs/config';
-import { RateLimitterModule } from '../rate-limitter/rate-limitter.module';
+import { RateLimitterModule } from '../rate-limiter/rate-limiter.module';
 import { join } from 'path';
-import { RateLimitterService } from 'src/modules/rate-limitter/rate-limitter.service';
+import { RateLimiterService } from '../../modules/rate-limiter/rate-limiter.service';
 
 @Module({
   imports: [
@@ -47,6 +47,6 @@ import { RateLimitterService } from 'src/modules/rate-limitter/rate-limitter.ser
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, RateLimitterService],
+  providers: [AuthService, RateLimiterService],
 })
 export class AuthModule {}

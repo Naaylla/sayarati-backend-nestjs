@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -13,7 +12,8 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/shared/types/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
-import { RateLimitterService } from 'src/modules/rate-limitter/rate-limitter.service';
+import { RateLimiterService } from '../rate-limiter/rate-limiter.service';
+import { TooManyRequestsException } from '../../core/exceptions/too-many-request';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
     private mailerService: MailerService,
     private configService: ConfigService,
-    private rateLimitterService: RateLimitterService,
+    private rateLimiterService: RateLimiterService,
   ) {}
   async register(registerDto: RegisterDto) {
     const { email, password, confirmPassword } = registerDto;
@@ -58,9 +58,9 @@ export class AuthService {
       },
     );
     const sentMail = await this.mailerService.sendMail({
-      to: 'kemmounramzy93@gmail.com', // list of receivers
-      from: 'abderrahmane.test@gmail.com', // sender address
-      subject: 'Testing Nest MailerModule ✔', // Subject line
+      to: 'kemmounramzy93@gmail.com',
+      from: 'abderrahmane.test@gmail.com',
+      subject: 'Testing Nest MailerModule ✔',
       text: 'welcome', // plaintext body
       html: mailToken,
     });
@@ -108,9 +108,15 @@ export class AuthService {
 
   async resendVertification(id: number) {
     const account = await this.accountService.findById(id);
+    const isAllowed = await this.rateLimiterService.isAllowed(
+      account.email,
+      30,
+    );
 
-    if (!this.rateLimitterService.isAllowed(account.email, 30)) {
-      throw new BadRequestException('Too many request');
+    if (!isAllowed) {
+      throw new TooManyRequestsException(
+        'You can send a new verification link each 30 seconds',
+      );
     }
 
     const mailToken = await this.jwtService.signAsync(
@@ -124,14 +130,12 @@ export class AuthService {
     );
 
     const sentMail = await this.mailerService.sendMail({
-      to: account.email, // list of receivers
+      to: account.email,
       from: this.configService.get('EMAIL_USER'),
       subject: 'Testing Nest MailerModule ✔',
       text: 'welcome',
       html: mailToken,
     });
-
-    console.log({ sentMail });
 
     return sentMail;
   }

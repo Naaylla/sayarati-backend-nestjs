@@ -3,7 +3,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AccountModule } from './modules/account/account.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { ConfigModule } from '@nestjs/config';
-import { RateLimitterModule } from './modules/rate-limitter/rate-limitter.module';
+import { RateLimitterModule } from './modules/rate-limiter/rate-limiter.module';
 
 @Module({
   imports: [
