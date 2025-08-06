@@ -4,6 +4,7 @@ import { AccountModule } from './modules/account/account.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { ConfigModule } from '@nestjs/config';
 import { RateLimitterModule } from './modules/rate-limiter/rate-limiter.module';
+import { JwtStrategy } from './modules/auth/strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -13,5 +14,6 @@ import { RateLimitterModule } from './modules/rate-limiter/rate-limiter.module';
     ProfileModule,
     RateLimitterModule,
   ],
+  providers: [JwtStrategy],
 })
 export class AppModule {}

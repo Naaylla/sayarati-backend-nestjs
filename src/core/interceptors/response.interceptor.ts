@@ -34,26 +34,25 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
 
     return next.handle().pipe(
       map((res: unknown) => this.responseHandler(res, context, now)),
-      catchError((err: HttpException) =>
-        throwError(() => this.errorHandler(err, context, now)),
-      ),
+      // catchError((err: Error) =>
+      //   throwError(() => this.errorHandler(err, context, now)),
+      // ),
     );
   }
 
-  errorHandler(
-    exception: HttpException,
-    context: ExecutionContext,
-    startTime: number,
-  ) {
+  errorHandler(exception: Error, context: ExecutionContext, startTime: number) {
     const ctx = context.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
-
-    const status =
-      exception instanceof QueryFailedError ||
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    HttpException;
+    let status: number;
+    if (exception instanceof QueryFailedError) {
+      status = HttpStatus.BAD_REQUEST;
+    } else if (exception instanceof HttpException) {
+      status = exception.getStatus();
+    } else {
+      status = HttpStatus.INTERNAL_SERVER_ERROR;
+    }
 
     const responseTime = `${Date.now() - startTime}ms`;
 

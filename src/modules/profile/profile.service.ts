@@ -10,8 +10,13 @@ export class ProfileService {
     @Inject('PROFILE_REPOSITORY')
     private profileRepository: Repository<Profile>,
   ) {}
-  create(createProfileDto: CreateProfileDto) {
-    return 'This action adds a new profile';
+  async create(createProfileDto: CreateProfileDto, accountId: number) {
+    const profile = this.profileRepository.create({
+      ...createProfileDto,
+      account: { id: accountId },
+    });
+
+    await this.profileRepository.insert(profile);
   }
 
   async findAll(accountId: number) {
@@ -26,15 +31,41 @@ export class ProfileService {
     return profiles;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
+  async findOne(id: number, accountId: number) {
+    const profile = await this.profileRepository.findOne({
+      where: {
+        id,
+        account: {
+          id: accountId,
+        },
+      },
+    });
+
+    return profile;
   }
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
+  async update(
+    id: number,
+    accountId: number,
+    updateProfileDto: UpdateProfileDto,
+  ) {
+    await this.profileRepository.update(
+      {
+        id,
+        account: { id: accountId },
+      },
+      updateProfileDto,
+    );
+
+    return;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} profile`;
+  async delete(id: number, accountId: number) {
+    await this.profileRepository.delete({
+      id,
+      account: { id: accountId },
+    });
+
+    return;
   }
 }

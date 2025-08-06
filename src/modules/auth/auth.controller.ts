@@ -1,9 +1,21 @@
-import { Controller, Post, Body, Get, Query, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Query,
+  Request,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
 import { SetCookies, ClearCookies, CookieSettings } from '@nestjsplus/cookies';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ResponseMessage } from '../../core/decorators/response-message.decorator';
+import { AuthGuard } from 'src/core/guards/auth.guard';
+import { Account } from 'src/core/guards/account.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -30,9 +42,27 @@ export class AuthController {
   }
 
   @Post('login')
+  @SetCookies({ name: 'refreshToken', httpOnly: true, sameSite: true })
   @ResponseMessage('Logged in successfully')
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  @HttpCode(HttpStatus.OK)
+  async login(
+    @Body() loginDto: LoginDto,
+
+    @Request() request: Request & { _cookies: CookieSettings[] },
+  ) {
+    const { accessToken, refreshToken, account } =
+      await this.authService.login(loginDto);
+    request._cookies = [
+      {
+        name: 'refreshToken',
+        value: refreshToken,
+      },
+    ];
+
+    return {
+      account,
+      accessToken,
+    };
   }
 
   @Get('verify-account')
@@ -43,19 +73,22 @@ export class AuthController {
 
   @Post('resend-verification')
   @ResponseMessage('Verification resent')
-  resendVerification() {
-    const userId = 28;
-    return this.authService.resendVertification(userId);
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  resendVerification(@Account('id') accountId: number) {
+    return this.authService.resendVertification(accountId);
   }
 
   @Post('refresh-token')
   @SetCookies({ name: 'refreshToken', httpOnly: true, sameSite: true })
   @ResponseMessage('Set refresh token sucessfully')
+  @HttpCode(HttpStatus.OK)
   async refreshToken(
     @Request() request: Request & { _cookies: CookieSettings[] },
+    @Account('id') accountId: number,
   ) {
-    const id = 1;
-    const refreshToken = await this.authService.refreshToken(id);
+    console.log({ accountId });
+    const refreshToken = await this.authService.refreshToken(accountId);
     request._cookies = [
       {
         name: 'refreshToken',

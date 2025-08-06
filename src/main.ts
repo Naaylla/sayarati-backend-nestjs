@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { QueryFailedExceptionFilter } from './core/exceptions/filters';
 import cookieParser from 'cookie-parser';
 import { ResponseInterceptor } from './core/interceptors/response.interceptor';
+import { LoggerMiddleware } from './core/middlewares/logger.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -29,6 +30,7 @@ async function bootstrap() {
   app.useGlobalFilters(new QueryFailedExceptionFilter());
 
   app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
+  app.use(new LoggerMiddleware().use);
 
   app.use(cookieParser());
   await app.listen(process.env.PORT ?? 8000);

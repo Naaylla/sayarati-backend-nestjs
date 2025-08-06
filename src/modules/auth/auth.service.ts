@@ -117,7 +117,9 @@ export class AuthService {
       },
     );
 
-    return { account, accessToken };
+    const { password: _, ...accountWithoutPassword } = account;
+
+    return { account: accountWithoutPassword, accessToken, refreshToken };
   }
   async verifyAccount(token: string) {
     const { id, type } = await this.jwtService.verifyAsync<JwtPayload>(token);
@@ -125,11 +127,11 @@ export class AuthService {
       return;
     }
 
-    const account = await this.accountService.update(id, {
+    await this.accountService.update(id, {
       isVerified: true,
     });
 
-    return account;
+    return;
   }
   async resendVertification(id: number) {
     const account = await this.accountService.findById(id);
