@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/shared/types/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
-import { RateLimitterService } from 'src/rate-limitter/rate-limitter.service';
+import { RateLimitterService } from 'src/modules/rate-limitter/rate-limitter.service';
 
 @Injectable()
 export class AuthService {
@@ -62,10 +62,9 @@ export class AuthService {
       from: 'abderrahmane.test@gmail.com', // sender address
       subject: 'Testing Nest MailerModule ✔', // Subject line
       text: 'welcome', // plaintext body
-      html: '<b>welcome</b>', // HTML body content
+      html: mailToken,
     });
 
-    console.log({ sentMail });
     return { account, accessToken };
   }
   async login(loginDto: LoginDto) {
