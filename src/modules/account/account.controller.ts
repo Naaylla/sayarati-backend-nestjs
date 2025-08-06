@@ -1,7 +1,8 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
 import { AccountService } from './account.service';
 import type { Request } from 'express';
 import { REQUEST } from '@nestjs/core';
+import { AuthGuard } from 'src/core/guards/auth.gard';
 
 @Controller('account')
 export class AccountController {
@@ -11,5 +12,8 @@ export class AccountController {
   ) {}
 
   @Get('profile')
-  getProfile() {}
+  @UseGuards(AuthGuard)
+  getProfile() {
+    return { message: 'Zeref, Team lead te3 DEV' };
+  }
 }

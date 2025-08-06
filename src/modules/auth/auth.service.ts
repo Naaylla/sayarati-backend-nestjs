@@ -48,6 +48,16 @@ export class AuthService {
       },
     );
 
+    const refreshToken = this.jwtService.signAsync(
+      {
+        id: account.id,
+        type: 'AUTHENTICATION',
+      },
+      {
+        expiresIn: '30d',
+      },
+    );
+
     const mailToken = await this.jwtService.signAsync(
       {
         id: account.id,
@@ -57,7 +67,8 @@ export class AuthService {
         expiresIn: '1h',
       },
     );
-    const sentMail = await this.mailerService.sendMail({
+
+    await this.mailerService.sendMail({
       to: 'kemmounramzy93@gmail.com',
       from: 'abderrahmane.test@gmail.com',
       subject: 'Testing Nest MailerModule ✔',
@@ -65,7 +76,7 @@ export class AuthService {
       html: mailToken,
     });
 
-    return { account, accessToken };
+    return { account, accessToken, refreshToken };
   }
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
@@ -86,9 +97,25 @@ export class AuthService {
       throw new NotFoundException('Password is incorrect');
     }
 
-    const accessToken = this.jwtService.signAsync({
-      id: account.id,
-    });
+    const accessToken = this.jwtService.signAsync(
+      {
+        id: account.id,
+        type: 'AUTHENTICATION',
+      },
+      {
+        expiresIn: '1d',
+      },
+    );
+
+    const refreshToken = this.jwtService.signAsync(
+      {
+        id: account.id,
+        type: 'AUTHENTICATION',
+      },
+      {
+        expiresIn: '30d',
+      },
+    );
 
     return { account, accessToken };
   }
