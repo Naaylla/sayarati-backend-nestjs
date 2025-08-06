@@ -38,7 +38,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const accessToken = this.jwtService.signAsync(
+    const accessToken = await this.jwtService.signAsync(
       {
         id: account.id,
         type: 'AUTHENTICATION',
@@ -48,7 +48,7 @@ export class AuthService {
       },
     );
 
-    const refreshToken = this.jwtService.signAsync(
+    const refreshToken = await this.jwtService.signAsync(
       {
         id: account.id,
         type: 'AUTHENTICATION',
@@ -97,7 +97,7 @@ export class AuthService {
       throw new NotFoundException('Password is incorrect');
     }
 
-    const accessToken = this.jwtService.signAsync(
+    const accessToken = await this.jwtService.signAsync(
       {
         id: account.id,
         type: 'AUTHENTICATION',
@@ -107,7 +107,7 @@ export class AuthService {
       },
     );
 
-    const refreshToken = this.jwtService.signAsync(
+    const refreshToken = await this.jwtService.signAsync(
       {
         id: account.id,
         type: 'AUTHENTICATION',
@@ -119,20 +119,18 @@ export class AuthService {
 
     return { account, accessToken };
   }
-
   async verifyAccount(token: string) {
     const { id, type } = await this.jwtService.verifyAsync<JwtPayload>(token);
     if (type !== 'EMAIL_VERIFICATION') {
       return;
     }
 
-    const account = this.accountService.update(id, {
+    const account = await this.accountService.update(id, {
       isVerified: true,
     });
 
     return account;
   }
-
   async resendVertification(id: number) {
     const account = await this.accountService.findById(id);
     const isAllowed = await this.rateLimiterService.isAllowed(
@@ -165,5 +163,18 @@ export class AuthService {
     });
 
     return sentMail;
+  }
+  async refreshToken(id: number) {
+    const refreshToken = await this.jwtService.signAsync(
+      {
+        id,
+        type: 'AUTHENTICATION',
+      },
+      {
+        expiresIn: '30d',
+      },
+    );
+
+    return refreshToken;
   }
 }
