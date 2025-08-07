@@ -33,7 +33,7 @@ export class AuthService {
     }
     const hashedPassword = await HashUtil.hash(password);
 
-    const account = await this.accountService.create({
+    const { account } = await this.accountService.create({
       email,
       password: hashedPassword,
     });
@@ -81,7 +81,7 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
 
-    const account = await this.accountService.findByEmail(email);
+    const { account } = await this.accountService.findByEmail(email);
 
     if (!account) {
       throw new NotFoundException('Account not found');
@@ -134,7 +134,7 @@ export class AuthService {
     return;
   }
   async resendVertification(id: number) {
-    const account = await this.accountService.findById(id);
+    const { account } = await this.accountService.findById(id);
     const isAllowed = await this.rateLimiterService.isAllowed(
       account.email,
       30,

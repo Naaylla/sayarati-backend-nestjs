@@ -5,6 +5,7 @@ import { ProfileModule } from './modules/profile/profile.module';
 import { ConfigModule } from '@nestjs/config';
 import { RateLimitterModule } from './modules/rate-limiter/rate-limiter.module';
 import { JwtStrategy } from './modules/auth/strategies/jwt.strategy';
+import { FileUploadModule } from './modules/file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { JwtStrategy } from './modules/auth/strategies/jwt.strategy';
     AccountModule,
     ProfileModule,
     RateLimitterModule,
+    FileUploadModule,
   ],
   providers: [JwtStrategy],
 })

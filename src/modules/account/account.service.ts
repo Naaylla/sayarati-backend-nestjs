@@ -22,17 +22,7 @@ export class AccountService {
 
     const { password: _, ...accountWithoutPassword } = account;
 
-    return accountWithoutPassword;
-  }
-
-  async findAll() {
-    const accounts = await this.accountRepository.find({
-      select: {
-        password: false,
-      },
-    });
-
-    return accounts;
+    return { account: accountWithoutPassword };
   }
 
   async findByEmail(email: string) {
@@ -44,12 +34,15 @@ export class AccountService {
       throw new NotFoundException('Account not found');
     }
 
-    return account;
+    return { account };
   }
 
   async findById(id: number) {
-    const account = await this.accountRepository.findOneBy({
-      id,
+    const account = await this.accountRepository.findOne({
+      where: { id },
+      relations: {
+        profiles: true,
+      },
     });
 
     if (!account) {
@@ -57,7 +50,7 @@ export class AccountService {
     }
 
     const { password, ...accountWithoutPassword } = account;
-    return accountWithoutPassword;
+    return { account: accountWithoutPassword };
   }
 
   async update(id: number, updateAccountDto: UpdateAccountDto) {
