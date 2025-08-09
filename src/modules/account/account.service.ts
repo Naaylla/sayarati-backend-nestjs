@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { Account } from './entities/account.entity';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { HashUtil } from 'src/core/utils/hash.util';
 
 @Injectable()
 export class AccountService {
@@ -21,35 +22,26 @@ export class AccountService {
 
     const { password: _, ...accountWithoutPassword } = account;
 
-    return accountWithoutPassword;
-  }
-
-  async findAll() {
-    const accounts = await this.accountRepository.find();
-
-    return accounts;
+    return { account: accountWithoutPassword };
   }
 
   async findByEmail(email: string) {
-    const account = await this.accountRepository.findOne({
-      where: {
-        email,
-      },
+    const account = await this.accountRepository.findOneBy({
+      email,
     });
 
     if (!account) {
       throw new NotFoundException('Account not found');
     }
 
-    const { password: _, ...accountWithoutPassword } = account;
-
-    return account;
+    return { account };
   }
 
   async findById(id: number) {
     const account = await this.accountRepository.findOne({
-      where: {
-        id,
+      where: { id },
+      relations: {
+        profiles: true,
       },
     });
 
@@ -57,14 +49,44 @@ export class AccountService {
       throw new NotFoundException('Account not found');
     }
 
-    const { password: _, ...accountWithoutPassword } = account;
-
-    return account;
+    const { password, ...accountWithoutPassword } = account;
+    return { account: accountWithoutPassword };
   }
 
   async update(id: number, updateAccountDto: UpdateAccountDto) {
-    const account = await this.accountRepository.update(id, updateAccountDto);
+    await this.accountRepository.update({ id }, updateAccountDto);
 
-    return account;
+    return;
+  }
+
+  async updatePassword(id: number, oldPassword: string, newPassword: string) {
+    const account = await this.accountRepository.findOneBy({ id });
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    const isValidPassword = await HashUtil.verify(
+      account.password,
+      oldPassword,
+    );
+    if (!isValidPassword) {
+      throw new NotFoundException('Password is incorrect');
+    }
+
+    await this.accountRepository.update(
+      {
+        id,
+      },
+      {
+        password: newPassword,
+      },
+    );
+    return;
+  }
+
+  async delete(id: number) {
+    await this.accountRepository.delete({ id });
+
+    return;
   }
 }

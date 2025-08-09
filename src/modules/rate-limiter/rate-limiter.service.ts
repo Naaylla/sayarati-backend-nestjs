@@ -2,8 +2,10 @@ import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 
 @Injectable()
-export class RateLimitterService {
-  private redis = new Redis();
+export class RateLimiterService {
+  private redis = new Redis({
+    host: 'localhost',
+  });
 
   async isAllowed(key: string, ttlInSeconds: number): Promise<boolean> {
     const result = await this.redis.set(

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
 import { Request, Response } from 'express';
+import { format } from 'date-fns';
 
 @Catch(QueryFailedError)
 export class QueryFailedExceptionFilter implements ExceptionFilter {
@@ -14,8 +15,7 @@ export class QueryFailedExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const { url } = request;
-    const { name, message, parameters } = exception;
+    const { name, message } = exception;
     const driverError = exception.driverError as any;
 
     let statusCode = HttpStatus.BAD_REQUEST;
@@ -74,13 +74,16 @@ export class QueryFailedExceptionFilter implements ExceptionFilter {
         statusCode = HttpStatus.BAD_REQUEST;
         break;
     }
+    const startTime = request['startTime'];
+    const responseTime = startTime ? `${Date.now() - startTime}ms` : 'N/A';
 
-    const errorResponse = {
-      error: name,
+    response.status(statusCode).json({
+      success: false,
       statusCode,
+      path: request.url,
       message: errorMessage,
-    };
-
-    response.status(statusCode).json(errorResponse);
+      timestamp: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+      responseTime,
+    });
   }
 }

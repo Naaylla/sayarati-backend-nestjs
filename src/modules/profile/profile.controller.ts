@@ -6,38 +6,75 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  Headers,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileService } from './profile.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { AuthGuard } from 'src/core/guards/auth.guard';
+import { Account } from 'src/core/guards/account.guard';
+import { ResponseMessage } from 'src/core/decorators/response-message.decorator';
 
 @Controller('profile')
+@UseGuards(AuthGuard)
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Post()
-  create(@Body() createProfileDto: CreateProfileDto) {
-    return this.profileService.create(createProfileDto);
+  @ResponseMessage('Profile created succesfully')
+  create(
+    @Body() createProfileDto: CreateProfileDto,
+    @Account('id') accountId: number,
+  ) {
+    return this.profileService.create(createProfileDto, accountId);
   }
 
   @Get()
-  findAll() {
-    const accountId = 1;
+  @ResponseMessage('Profiles fetched successfully')
+  findAll(@Account('id') accountId: number) {
     return this.profileService.findAll(accountId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.profileService.findOne(+id);
+  @ResponseMessage('Profile fetched successfully')
+  findOne(@Param('id') id: number, @Account('id') accountId: number) {
+    return this.profileService.findOne(id, accountId);
   }
 
+  @ResponseMessage('Profile updated successfully')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profileService.update(+id, updateProfileDto);
+  update(
+    @Param('id') id: number,
+    @Account('id') accountId: number,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.profileService.update(id, accountId, updateProfileDto);
+  }
+
+  @ResponseMessage('Profile picture updated successfully')
+  @Patch('picture/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  updateProfilePicture(
+    @Param('id') id: number,
+    @Account('id') accountId: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Headers('authorization') authorizationHeader: string,
+  ) {
+    return this.profileService.updateProfilePicture(
+      id,
+      accountId,
+      file,
+      authorizationHeader,
+    );
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.profileService.remove(+id);
+  @ResponseMessage('Profile deleted successfully')
+  delete(@Param('id') id: number, @Account('id') accountId: number) {
+    return this.profileService.delete(id, accountId);
   }
 }
