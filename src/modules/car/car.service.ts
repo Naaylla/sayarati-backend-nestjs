@@ -34,7 +34,7 @@ export class CarService {
   }
 
   async findOne(id: number, accountId: number) {
-    const car = this.carRepository.find({
+    const car = this.carRepository.findOne({
       where: {
         id,
         account : {
