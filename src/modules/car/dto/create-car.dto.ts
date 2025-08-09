@@ -6,10 +6,12 @@ import {
   Max, 
   IsOptional, 
   IsEnum, 
-  IsDateString 
+  IsDateString, 
+  IsDate
 } from 'class-validator';
 
 import { FuelType, TransmissionType } from '../../../shared/enums/car.enums';
+import { DateArg } from 'date-fns';
 
 export class CreateCarDto {
   @IsString()
@@ -40,12 +42,12 @@ export class CreateCarDto {
   @IsEnum(TransmissionType)
   transmissionType: TransmissionType;
 
-  @IsDateString()
-  lastOilChangeDate: string;
+  @IsDate()
+  lastOilChangeDate: Date;
 
-  @IsDateString()
-  lastTireChangeDate: string;
+  @IsDate()
+  lastTireChangeDate: Date;
 
-  @IsDateString()
-  vehicleInspectionDate: string;
+  @IsDate()
+  vehicleInspectionDate: Date;
 }
