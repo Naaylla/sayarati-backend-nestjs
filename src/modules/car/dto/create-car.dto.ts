@@ -6,7 +6,6 @@ import {
   Max, 
   IsOptional, 
   IsEnum, 
-  IsDateString, 
   IsDate
 } from 'class-validator';
 
@@ -27,9 +26,8 @@ export class CreateCarDto {
   @Max(new Date().getFullYear())
   year: number;
 
-  @IsString()
-  @Length(1, 20)
-  matricule: string;  
+  @IsNumber()
+  matricule: number;  
 
   @IsOptional()
   @IsString()

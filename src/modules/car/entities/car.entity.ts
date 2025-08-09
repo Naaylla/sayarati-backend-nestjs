@@ -3,12 +3,14 @@ import {
   Column,
   PrimaryGeneratedColumn,
   Unique,
-  OneToMany,
+  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
+import type { Relation } from 'typeorm';
 import { FuelType, TransmissionType } from '../../../shared/enums/car.enums';
+import { Account } from '../../account/entities/account.entity';
 
 
 @Entity()
@@ -64,23 +66,19 @@ lastTireChangeDate: Date;
 vehicleInspectionDate: Date;
 
 
-//i'm leaving this here for adding reference to "reminders" iD later on
-//   @OneToMany(() => Profile, (profile) => profile.account, {
-//     onDelete: 'CASCADE',
-//   })
-//   profiles: Relation<Profile>[];
+@ManyToOne(() => Account, (account) => account.profiles)
+account: Relation<Account>;
 
+@CreateDateColumn({
+  type: 'timestamp',
+  default: () => 'CURRENT_TIMESTAMP(6)',
+})
+public createdAt: Date;
 
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
-  public createdAt: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  public updatedAt: Date;
+@UpdateDateColumn({
+  type: 'timestamp',
+  default: () => 'CURRENT_TIMESTAMP(6)',
+  onUpdate: 'CURRENT_TIMESTAMP(6)',
+})
+public updatedAt: Date;
 }

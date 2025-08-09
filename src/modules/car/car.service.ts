@@ -12,25 +12,55 @@ export class CarService {
     private carRepository: Repository<Car>,
   ) {}
 
+  async create(createCarDto: CreateCarDto, accountId: number) {
+        const car = this.carRepository.create({
+      ...createCarDto,
+      account: { id: accountId },
+    });
 
-
-  create(createCarDto: CreateCarDto) {
-    return 'this action create a new car';
+    await this.carRepository.insert(car);
+    return { car };
   }
 
-  findAll() {
-    return `This action returns all car`;
+  async findAll(accountId: number) {
+    const cars = await this.carRepository.find({
+      where : {
+        account: {
+          id: accountId
+        }
+      }
+    })
+    return { cars }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} car`;
+  async findOne(id: number, accountId: number) {
+    const car = this.carRepository.find({
+      where: {
+        id,
+        account : {
+          id: accountId
+        }
+      }
+    })
+
+    return { car }
   }
 
-  update(id: number, updateCarDto: UpdateCarDto) {
-    return `This action updates a #${id} car`;
+  async update(id: number, updateCarDto: UpdateCarDto, AccountID: number) {
+    await this.carRepository.update(
+      {
+      id,
+      account: {
+        id: AccountID
+      }},
+      updateCarDto
+    )
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} car`;
+  async remove(id: number, accountId: number) {
+    await this.carRepository.delete({
+      id,
+      account: {id: accountId}
+    })
   }
 }
