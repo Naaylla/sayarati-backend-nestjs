@@ -10,7 +10,6 @@ import {
 } from 'class-validator';
 
 import { FuelType, TransmissionType } from '../../../shared/enums/car.enums';
-import { DateArg } from 'date-fns';
 
 export class CreateCarDto {
   @IsString()
