@@ -8,12 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { FuelType, TransmissionType } from '../../../shared/enums/car.enums';
 
-enum FuelType {
-    ESSENCE = 'essence',
-    DIESEL = 'diesel',
-    ELECTRIC = 'electric'
-} //i'm not sure which file where to put this
 
 @Entity()
 
@@ -51,14 +47,11 @@ export class Car {
   
   @Column({
   type: 'enum',
-  enum: ['automatic', 'manual'],
+  enum: TransmissionType,
 })
-transmissionType: 'automatic' | 'manual';
+transmissionType: TransmissionType;
 
 
-
-@Column('date')
-  dob: Date;
 
 @Column('date')
 lastOilChangeDate: Date;
