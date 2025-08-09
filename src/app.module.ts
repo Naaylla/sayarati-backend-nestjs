@@ -4,6 +4,9 @@ import { AccountModule } from './modules/account/account.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { ConfigModule } from '@nestjs/config';
 import { RateLimitterModule } from './modules/rate-limitter/rate-limitter.module';
+import { CarModule } from './car/car.module';
+import { Car } from './car/car';
+import { CarModule } from './car/car.module';
 
 @Module({
   imports: [
@@ -12,6 +15,8 @@ import { RateLimitterModule } from './modules/rate-limitter/rate-limitter.module
     AccountModule,
     ProfileModule,
     RateLimitterModule,
+    CarModule,
   ],
+  providers: [Car],
 })
 export class AppModule {}
