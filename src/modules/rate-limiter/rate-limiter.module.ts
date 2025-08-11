@@ -4,4 +4,4 @@ import { RateLimiterService } from './rate-limiter.service';
 @Module({
   providers: [RateLimiterService],
 })
-export class RateLimitterModule {}
+export class RateLimiterModule {}
