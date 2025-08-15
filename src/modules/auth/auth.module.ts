@@ -36,7 +36,7 @@ import { RateLimiterService } from '../../modules/rate-limiter/rate-limiter.serv
           from: '"From Name" <from@example.com>',
         },
         template: {
-          dir: join(__dirname, 'templates'),
+          dir: join('src', 'templates'),
           adapter: new EjsAdapter(),
           options: {
             strict: true,

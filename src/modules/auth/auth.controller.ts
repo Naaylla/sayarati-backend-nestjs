@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Redirect,
 } from '@nestjs/common';
 import { SetCookies, ClearCookies, CookieSettings } from '@nestjsplus/cookies';
 import { AuthService } from './auth.service';
@@ -66,7 +67,7 @@ export class AuthController {
   }
 
   @Get('verify-account')
-  @ResponseMessage('Account verified successfully')
+  @Redirect('https://github.com/ramzykemmoun/sayarati-backend-nestjs')
   verifyAccount(@Query('token') token: string) {
     return this.authService.verifyAccount(token);
   }

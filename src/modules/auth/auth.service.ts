@@ -67,13 +67,19 @@ export class AuthService {
         expiresIn: '1h',
       },
     );
+    console.log(email);
 
     await this.mailerService.sendMail({
-      to: 'kemmounramzy93@gmail.com',
-      from: 'abderrahmane.test@gmail.com',
-      subject: 'Testing Nest MailerModule ✔',
-      text: 'welcome', // plaintext body
-      html: mailToken,
+      to: account.email,
+      from: this.configService.get('EMAIL_USER'),
+      subject: 'Verify Your Account',
+      template: './verify-account',
+      context: {
+        appName: 'Sayarati',
+        email: account.email,
+        verifyUrl: `http://localhost:8000/verify-account?token=${mailToken}`,
+        year: new Date().getFullYear(),
+      },
     });
 
     return { account, accessToken, refreshToken };
