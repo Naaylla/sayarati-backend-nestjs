@@ -1,12 +1,12 @@
-import { 
-  IsString, 
-  Length, 
-  IsNumber, 
-  Min, 
-  Max, 
-  IsOptional, 
-  IsEnum, 
-  IsDate
+import {
+  IsString,
+  Length,
+  IsNumber,
+  Min,
+  Max,
+  IsOptional,
+  IsEnum,
+  IsDate,
 } from 'class-validator';
 
 import { FuelType, TransmissionType } from '../../../shared/enums/car.enums';
@@ -26,7 +26,7 @@ export class CreateCarDto {
   year: number;
 
   @IsNumber()
-  matricule: number;  
+  matricule: number;
 
   @IsOptional()
   @IsString()

@@ -7,7 +7,7 @@ import { AccountModule } from '../account/account.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { ConfigService } from '@nestjs/config';
-import { RateLimitterModule } from '../rate-limiter/rate-limiter.module';
+import { RateLimiterModule } from '../rate-limiter/rate-limiter.module';
 import { join } from 'path';
 import { RateLimiterService } from '../../modules/rate-limiter/rate-limiter.service';
 
@@ -15,7 +15,7 @@ import { RateLimiterService } from '../../modules/rate-limiter/rate-limiter.serv
   imports: [
     DatabaseModule,
     AccountModule,
-    RateLimitterModule,
+    RateLimiterModule,
     JwtModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET_OR_KEY'),

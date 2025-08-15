@@ -179,4 +179,14 @@ export class AuthService {
 
     return refreshToken;
   }
+
+  async forgotPassword(email: string) {
+    await this.mailerService.sendMail({
+      to: email,
+      from: 'abderrahmane.test@gmail.com',
+      subject: 'Testing Nest MailerModule ✔',
+      text: 'welcome', // plaintext body
+      html: 'mailToken',
+    });
+  }
 }

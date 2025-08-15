@@ -1,10 +1,10 @@
 export enum FuelType {
-    ESSENCE = 'essence',
-    DIESEL = 'diesel',
-    ELECTRIC = 'electric'
+  ESSENCE = 'essence',
+  DIESEL = 'diesel',
+  ELECTRIC = 'electric',
 }
 
-export enum TransimissionType { 
-    AUTOMATIC = 'automatic',
-    MANUAL = 'manual',
+export enum TransmissionType {
+  AUTOMATIC = 'automatic',
+  MANUAL = 'manual',
 }

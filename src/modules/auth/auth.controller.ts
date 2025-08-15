@@ -87,7 +87,6 @@ export class AuthController {
     @Request() request: Request & { _cookies: CookieSettings[] },
     @Account('id') accountId: number,
   ) {
-    console.log({ accountId });
     const refreshToken = await this.authService.refreshToken(accountId);
     request._cookies = [
       {
@@ -103,6 +102,13 @@ export class AuthController {
   @ClearCookies('refreshToken')
   @ResponseMessage('Logged out successfully')
   logout() {
+    return;
+  }
+
+  @Post('forgot-password')
+  @ClearCookies('refreshToken')
+  @ResponseMessage('Logged out successfully')
+  forgotPassword() {
     return;
   }
 }
