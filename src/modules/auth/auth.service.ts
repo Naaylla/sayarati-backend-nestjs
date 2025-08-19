@@ -187,12 +187,20 @@ export class AuthService {
   }
 
   async forgotPassword(email: string) {
+    const token = '';
+
+    const resetUrl = `https://sayarati.com/reset-password?token=${token}`;
+
     await this.mailerService.sendMail({
       to: email,
       from: 'abderrahmane.test@gmail.com',
-      subject: 'Testing Nest MailerModule ✔',
-      text: 'welcome', // plaintext body
-      html: 'mailToken',
+      subject: 'Reset Your Password',
+      template: 'forgot-password',
+      context: {
+        appName: 'MyApp',
+        resetUrl,
+        year: new Date().getFullYear(),
+      },
     });
   }
 }
